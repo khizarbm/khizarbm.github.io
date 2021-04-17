@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+    <title>OS Assignment</title>
+</head>
+
+<body>
+    <nav>
+        <a href="/index.html">
+            <p>Home</p>
+        </a>
+        <a href="/cv.html" target="_blank">
+            <p>Resume</p>
+        </a>
+    </nav>
+    <main>
+        <h1>Building a 64-bit OS</h1>
+        <hr>
+        <div>
+            <h2>Overview</h2>
+            <p>We are given an assignment to learn how to create a 64 bit Operating System kernel that displayed some
+                text as shown below. We used docker to help simplify the process and used Qemu to emulate the Operating
+                System on our device. We coded along the videos provided for guideline. After successfully running the
+                Operating System, we modified the print function in <b>main.c</b> to print our own custom text.</p>
+            <p class="img"><img src="/imgs/output.jpeg" alt="output image"></p>
+        </div>
+        <div>
+            <hr>
+            <h2>Pre Requsites</h2>
+            <p>We used the following tools to build our Operating System:</p>
+            <ul class="code">
+                <li>Docker. (used to simply build process)</li>
+                <li>Qemu. (used to emulate the Operating System)</li>
+                <li>Visual Studio Code. (you can use any text editor)</li>
+            </ul>
+        </div>
+        <div>
+            <hr>
+            <h2>Explanation</h2>
+            <p>To remain consistent with the videos, we used the same names for the files as the person in the video. We
+                name our root folder <i>buildenv</i>.
+            </p>
+            <h3>Dockerfile</h3>
+            <p>This file will allows us to create a reproduceable build environment. It will also allow us to install
+                the required packages such as <b>nasm</b> which is used to compile the assembly code. Paste the
+                following
+                code in this file:</p>
+            <p class="code">FROM randomdude/gcc-cross-x86_64-elf
+
+                RUN apt-get update <br>
+                RUN apt-get upgrade -y<br>
+                RUN apt-get install -y nasm<br>
+                RUN apt-get install -y xorriso<br>
+                RUN apt-get install -y grub-pc-bin<br>
+                RUN apt-get install -y grub-common<br>
+                <br>
+                VOLUME /root/env<br>
+                WORKDIR /root/env
+            </p>
+            <p>Use the following command to build this docker image:</p>
+            <p class="code">docker build buildenv -t myos-buildenv</p>
+            <span class="note">Note: You need to have docker running in the background</span>
+            <p>Use the following command to build an instance of this docker image:</p>
+            <p class="code">docker run --rm -it -v "${pwd}:/root/env" myos-buildenv</p>
+            <span class="note">Note: This command is for powershell on Windows. For cmd, you will have to use a
+                different command.</span>
+            <h3>Hierarchy</h3>
+            <p>Next up, create the following hierarchy of folders and files in VsCode. We will explain the purpose of
+                each file later.</p>
+            <div class="code">
+                <ul>
+                    <li>buildenv
+                        <ul>
+                            <li class="file">Dockerfile</li>
+                        </ul>
+                    </li>
+                    <li>
+                        src
+                        <ul>
+                            <li>interface
+                                <ul>
+                                    <li class="file">print.h</li>
+                                </ul>
+                            </li>
+                            <li>implementation
+                                <ul>
+                                    <li>kernel
+                                        <ul>
+                                            <li class="file">main.c</li>
+                                        </ul>
+                                    </li>
+                                    <li>x86_64
+                                        <ul>
+                                            <li class="file">print.c</li>
+                                            <li>boot
+                                                <ul>
+                                                    <li class="file">header.asm</li>
+                                                    <li class="file">main.asm</li>
+                                                    <li class="file">main64.asm</li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        targets
+                        <ul>
+                            <li>
+                                x86_64
+                                <ul>
+                                    <li class="file">linker.ld</li>
+                                    <li>iso
+                                        <ul>
+                                            <li>boot
+                                                <ul>
+                                                    <li>grub
+                                                        <ul>
+                                                            <li class="file">grub.cfg</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="file">.gitignore</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="file">Makefile</li>
+                </ul>
+            </div>
+            <p><span class="note">Note: <span class="file">Files</span> are coloured red. The rest are folders.</span>
+            </p>
+        </div>
+        <div>
+            <hr>
+            <h2>Purpose of each file</h2>
+            <p>We will briefly explain the purpose of each file one by one.</p>
+            <h3>Header.asm</h3>
+            <p class="code">This file contains instructions for the <b>bootloader</b>. The purpose of the bootloader is
+                to locate and load the Operating System in an appropriate manner.</p>
+            <h3>Main.asm</h3>
+            <p class="code"></p>
+            <h3>Main64.asm</h3>
+            <p class="code">This file is used for booting the Operating System in 64 bits. It is linked with the
+                <b>main.asm</b> file
+            </p>
+            <h3>Grub.cfg</h3>
+            <p class="code">This file is used to create an ISO file.</p>
+            <h3>Linker.ld</h3>
+            <p class="code">The linker file links different parts of the code together.</p>
+            <h3>Main.c</h3>
+            <p class="code">This file contains the <b>C</b> code with functions which we use to display our desired
+                output on the screen.</p>
+            <h3>Print.c</h3>
+            <p class="code">This file is used to control the behaviour of the screen i.e the number of rows and columns.
+            </p>
+            <h3>Print.h</h3>
+            <p class="code">This file contains all the the function declarations that we use in <b>main.c</b></p>
+            <h3>Makefile</h3>
+            <p class="code">This file ensures that only the files that have been modified are rebuilt everytime we run
+                the build command. This saves time and resources.</p>
+            <div>
+                <hr>
+                <h2>Errors and their solutions</h2>
+                <p>I encountered the following errors:</p>
+                <ul>
+                    <li>
+                        <h3>Docker Virtualization error</h3>
+                        <h4>Error message:</h4>
+                        <p class="code">Docker for Windows error: “Hardware assisted virtualization and data execution
+                            protection must be enabled in the BIOS”</p>
+                        <h4>Solution:</h4>
+                        <p class="code">Go to your BIOS settings and enable virtualization.</p>
+                    </li>
+                    <li>
+                        <h3>No Rule error</h3>
+                        <h4>Error message:</h4>
+                        <p class="code">make *** No rule to make target 'build-x8_64'. Stop</p>
+                        <h4>Solution:</h4>
+                        <p class="code">This error is caused when there is a syntax error or if the file names are
+                            incorrect. Unfortuantely I tried everything but I could not resolve this error. It only
+                            worked after I cloned the entire repository of the person from the video.</p>
+                    </li>
+                </ul>
+                <div>
+                    <hr>
+                    <p id="footer">
+                        Khizar Bin Muzaffar <br>
+                        <b>CMS:</b> 302361 <br>
+                        <b>Repository:</b>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+
+</html>
