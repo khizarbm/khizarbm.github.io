@@ -153,10 +153,13 @@
             <p class="code">This file contains instructions for the <b>bootloader</b>. The purpose of the bootloader is
                 to locate and load the Operating System in an appropriate manner.</p>
             <h3>Main.asm</h3>
-            <p class="code"></p>
+            <p class="code">It is the entry point of our Operating System. This file contains the main assembly code for
+                our Operating System. We also set up the stack in this file. The stack is used to handle function calls.
+                We also set up page tables to map virtual memory to physical memory, allowing us to run our Operating
+                System in 64 bit mode.</p>
             <h3>Main64.asm</h3>
             <p class="code">This file is used for booting the Operating System in 64 bits. It is linked with the
-                <b>main.asm</b> file
+                <b>main.asm</b> file.
             </p>
             <h3>Grub.cfg</h3>
             <p class="code">This file is used to create an ISO file.</p>
@@ -169,7 +172,7 @@
             <p class="code">This file is used to control the behaviour of the screen i.e the number of rows and columns.
             </p>
             <h3>Print.h</h3>
-            <p class="code">This file contains all the the function declarations that we use in <b>main.c</b></p>
+            <p class="code">This file contains all the the function declarations that we use in <b>main.c</b>.</p>
             <h3>Makefile</h3>
             <p class="code">This file ensures that only the files that have been modified are rebuilt everytime we run
                 the build command. This saves time and resources.</p>
